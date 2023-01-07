@@ -11,18 +11,6 @@ const generateCompletionAction = async (info) => {
     console.log(error);
   }
 };
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.create({
-    id: 'context-run',
-    title: 'Generate T Swift song',
-    contexts: ['selection'],
-  });
-});
-chrome.contextMenus.onClicked.addListener(generateCompletionAction);
-
-const getKey = () => {
-
-}
 
 const generate = async (prompt) => {
   // Get your API key from storage
@@ -43,8 +31,8 @@ const generate = async (prompt) => {
       temperature: 0.7,
     }),
   });
-}
 
   // Select the top choice and send back
-const completion = await completionResponse.json();
-return completion.choices.pop();
+  const completion = await completionResponse.json();
+  return completion.choices.pop();
+};
