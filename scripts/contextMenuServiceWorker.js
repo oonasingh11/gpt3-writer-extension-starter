@@ -36,3 +36,13 @@ const generate = async (prompt) => {
   const completion = await completionResponse.json();
   return completion.choices.pop();
 };
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: 'context-run',
+    title: 'Generate Taylor Swift song',
+    contexts: ['selection'],
+  });
+});
+
+chrome.contextMenus.onClicked.addListener(generateCompletionAction);
