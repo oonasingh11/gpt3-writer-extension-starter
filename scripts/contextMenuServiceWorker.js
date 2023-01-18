@@ -1,23 +1,18 @@
-const generateCompletionAction = async (info) => {
-  try {
-    const { selectionText } = info;
-    const basePromptPrefix = `
-	Write me a song in the style of Taylor Swift
-
-	Song Title:
-	`;
-  const baseCompletion = await generate(`${basePromptPrefix}${selectionText}`);
-  } catch (error) {
-    console.log(error);
-  }
+const getKey = () => {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get(['openai-key'], (result) => {
+      if (result['openai-key']) {
+        const decodedKey = atob(result['openai-key']);
+        resolve(decodedKey);
+      }
+    });
+  });
 };
 
 const generate = async (prompt) => {
-  // Get your API key from storage
   const key = await getKey();
   const url = 'https://api.openai.com/v1/completions';
 
-  // Call completions endpoint
   const completionResponse = await fetch(url, {
     method: 'POST',
     headers: {
@@ -35,6 +30,22 @@ const generate = async (prompt) => {
   // Select the top choice and send back
   const completion = await completionResponse.json();
   return completion.choices.pop();
+}
+
+
+const generateCompletionAction = async (info) => {
+  try {
+    const { selectionText } = info;
+    const basePromptPrefix = `
+	Write me a song in the style of Taylor Swift
+
+	Song Title:
+	`;
+  const baseCompletion = await generate(`${basePromptPrefix}${selectionText}`);
+    console.log(baseCompletion.text)
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 chrome.runtime.onInstalled.addListener(() => {
