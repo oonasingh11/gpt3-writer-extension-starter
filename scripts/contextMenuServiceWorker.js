@@ -9,6 +9,22 @@ const getKey = () => {
   });
 };
 
+const sendMessage = (content) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const activeTab = tabs[0].id;
+
+    chrome.tabs.sendMessage(
+      activeTab,
+      { message: 'inject', content },
+      (response) => {
+        if (response.status === 'failed') {
+          console.log('injection failed.');
+        }
+      }
+    );
+  });
+};
+
 const generate = async (prompt) => {
   const key = await getKey();
   const url = 'https://api.openai.com/v1/completions';
@@ -35,6 +51,7 @@ const generate = async (prompt) => {
 
 const generateCompletionAction = async (info) => {
   try {
+    sendMessage('generating...');
     const { selectionText } = info;
     const basePromptPrefix = `
 	Write me a song in the style of Taylor Swift
@@ -45,6 +62,7 @@ const generateCompletionAction = async (info) => {
     console.log(baseCompletion.text)
   } catch (error) {
     console.log(error);
+    sendMessage(error.toString());
   }
 };
 
